@@ -1,1 +1,1 @@
-# wikimedia-content-adapter
+mv# wikimedia-content-adapter
