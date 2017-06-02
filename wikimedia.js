@@ -1,0 +1,178 @@
+const apiURL = 'https://commons.wikimedia.org/w/api.php'; // the url form the Wikimedia Rest api.
+const utils = require("./utils.js");
+var res = {};
+
+
+var filenames = {
+	URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=50"],
+	requestURL : "",
+	data : []
+}
+
+
+var fileinfos = {
+	requestURL : "",
+	URLparams : ["action=query","format=json","prop=imageinfo&"],
+	props : ["timestamp","user","url","size","mime","mediatype","dimensions","metadata","commonmetadata","extmetadata"],
+	data : []
+}
+var searchKeyword = "";
+var filters = [];
+var pageParams = {
+	limit : 10,
+	offset : 0,
+}
+
+var host = {
+	address : "",
+	createRequestAdress : function(limits,offset){
+		var queryTemp = ["q="+searchKeyword];
+		for(var filter in filters)
+			queryTemp.push("filter["+filter.name +"]="+filter.value);
+		queryTemp.push("page[limit]="  + limits);
+		queryTemp.push("page[offset]=" + offset);
+		return this.address +"?"+ queryTemp.join("&");
+	}
+}
+var result = {
+  		"jsonapi": 
+			{
+    			"version": "1.0",
+    			"meta" : 
+					{
+      					"name": "wikimedia-content-adapter",
+      					"source": "https://github.com/schul-cloud/wikimedia-content-adapter",
+      					"description": "This is an adpter for media-file search on wikimedia."
+    				}
+  			},
+  		"links": 
+			{
+				"self": 
+					{
+      					"href": "http://url.used.to/get/this/document?page[offset]=15&page[limit]=5",
+      					"meta": 
+							{
+        						"count": 0,
+        						"offset": 0,
+        						"limit": 0
+      						}
+    				},
+    			"first": "http://url.used.to/get/this/document?page[offset]=0&page[limit]=5",
+				"last": "http://url.used.to/get/this/document?page[offset]=50&page[limit]=5",
+    			"prev": "http://url.used.to/get/this/document?page[offset]=10&page[limit]=5",
+    			"next": "http://url.used.to/get/this/document?page[offset]=20&page[limit]=5"
+  			},
+			"data" : []
+			};
+
+
+var createURL = {
+	fileList : function(){
+		filenames.requestURL = apiURL +"?"+ filenames.URLparams.join("&");
+		return filenames.requestURL;
+	},
+
+
+	 fileInfos : function(){
+		fileinfos.URLparams.push("iiprop=" + fileinfos.props.join("%7C"));
+		fileinfos.URLparams.push("titles=" + filenames.data.join("%7C"));
+		fileinfos.requestURL = apiURL +"?"+ fileinfos.URLparams.join("&");
+		return  fileinfos.requestURL ;
+	}
+	
+}
+
+module.exports = {
+	use : function(query,response,serveradresse ){
+			res = response;
+			host.address = serveradresse;
+			filenames.URLparams.push("srsearch="+query.q);
+			var filter = query.filter;
+			for( filterParam in filter	){
+				filters.push(
+					{
+						name:filterParam,
+						value:filter[key]
+					} 
+				);
+			}
+			result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
+			result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
+		},
+	makeRequest: function(){
+		// create an request-promise
+		var rpFiles = require('request-promise');
+
+
+		rpFiles(createURL.fileList())
+			.then((requestResult) => {
+				return JSON.parse(requestResult);
+			})
+			.then((resultObject) => {
+				var files = resultObject.query.search;
+				for(var index in files){
+						filenames.data.push(utils.prepear4URL(files[index].title));
+				}
+				rpFileInfo = require('request-promise')(createURL.fileInfos())
+					.then((requesResult) =>{
+						return JSON.parse(requesResult);
+					}).then((InfosforFiles)=>{
+						var InfosforFiles = InfosforFiles.query.pages;
+						for(var index in InfosforFiles){
+							var InfoforFile = InfosforFiles[index];
+							var outputObj = {};
+								outputObj.title = InfoforFile.title.replace("File:","");
+								outputObj.url = InfoforFile.imageinfo[0].url;
+								outputObj.size = {
+									value: InfoforFile.imageinfo[0].size,
+									unit: "byte",
+									width: InfoforFile.imageinfo[0].width,
+									height: InfoforFile.imageinfo[0].height
+								};
+								outputObj.duration = InfoforFile.imageinfo[0].duration;
+								outputObj.duration_unit= "sec";
+								outputObj.contentCategory = "a";
+								outputObj.mimeType = InfoforFile.imageinfo[0].mime;
+								outputObj.license = {};
+								if(InfoforFile.imageinfo[0].extmetadata.License != undefined)
+									outputObj.license.value = InfoforFile.imageinfo[0].extmetadata.License.value;
+										
+								if(InfoforFile.imageinfo[0].extmetadata.Copyrighted != undefined)
+									outputObj.license.copyrighted = InfoforFile.imageinfo[0].extmetadata.Copyrighted.value;
+								
+								if (pageParams.offset <= 0 && result.links.self.meta.count < result.links.self.meta.limit){
+									result.data.push(outputObj);
+									result.links.self.meta.count++;
+								}else 
+									pageParams.offset--;
+							}
+						var offset = result.links.self.meta.offset;
+						var limit  = result.links.self.meta.limit;
+						result.links.first = host.createRequestAdress(limit,0);
+						result.links.self.href = host.createRequestAdress(limit,offset);
+						offset -=  limit;
+						result.links.prev = host.createRequestAdress(limit,offset);
+						offset +=  (limit*2);
+						result.links.next = host.createRequestAdress(limit,offset);
+						result.links.last = host.createRequestAdress(limit,50);
+						res.send(JSON.stringify(result));
+						})
+					.catch((err) => {
+						console.log(err);
+						res.send(JSON.stringify(result));
+					});
+
+			})
+			.catch((err) => {
+				console.log(err);
+				res.send(JSON.stringify(result));
+			});
+
+
+		}
+
+	}
+
+
+
+
