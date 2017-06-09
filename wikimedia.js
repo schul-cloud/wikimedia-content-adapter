@@ -1,105 +1,129 @@
 const apiURL = 'https://commons.wikimedia.org/w/api.php'; // the url form the Wikimedia Rest api.
 const utils = require("./utils.js");
-var res = {};
 
+function Request(query,response,serveradresse ){
 
-var filenames = {
-	URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=50"],
-	requestURL : "",
-	data : []
-}
-
-
-var fileinfos = {
-	requestURL : "",
-	URLparams : ["action=query","format=json","prop=imageinfo&"],
-	props : ["timestamp","user","url","size","mime","mediatype","dimensions","metadata","commonmetadata","extmetadata"],
-	data : []
-}
-var searchKeyword = "";
-var filters = [];
-var pageParams = {
-	limit : 10,
-	offset : 0,
-}
-
-var host = {
-	address : "",
-	createRequestAdress : function(limits,offset){
-		var queryTemp = ["q="+searchKeyword];
-		for(var filter in filters)
-			queryTemp.push("filter["+filter.name +"]="+filter.value);
-		queryTemp.push("page[limit]="  + limits);
-		queryTemp.push("page[offset]=" + offset);
-		return this.address +"?"+ queryTemp.join("&");
+	var res = response;
+	var filenames = {
+		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=25"],
+		requestURL : "",
+		data : []
 	}
-}
-var result = {
-  		"jsonapi": 
-			{
+
+
+	 var fileinfos = {
+		requestURL : "",
+		URLparams : ["action=query","format=json","prop=imageinfo&"],
+		props : ["timestamp","user","url","size","mime","mediatype","dimensions","metadata","commonmetadata","extmetadata"],
+		data : []
+	};
+	var searchKeyword = "";
+	var filter = {
+		validate : function(resultObject){
+			var valid = true ;
+			for( var i = 0 ; i < filter.count; i++){
+				switch (filter.data[i].name){
+					case ("size"):
+					case ("license"):
+						valid = valid && resultObject[filter.data[i].name].value == filter.data[i].value;
+						console.log(resultObject[filter.data[i].name].value +"\t" + filter.data[i].value );
+						break;
+					default:
+						valid = valid && resultObject[filter.data[i].name] == filter.data[i].value;
+						break;
+				}
+				console.log(valid);
+			}
+			console.log(resultObject["title"] + "\t" +valid );
+			return valid;
+		},
+		count : 0 ,
+		data : []
+	};
+	var pageParams = {
+		limit : 10,
+		offset : 0,
+	};
+
+	var host = {
+		address : "",
+		createRequestAdress : function(limits,offset){
+		var queryTemp = ["q="+searchKeyword];
+			for(var filterparam in filter.data)
+				queryTemp.push("filter["+filterparam.name +"]="+filterparam.value);
+			queryTemp.push("page[limit]="  + limits);
+			queryTemp.push("page[offset]=" + offset);
+			return this.address +"?"+ queryTemp.join("&");
+		}
+	};
+	var result = {
+  			"jsonapi":
+				{
     			"version": "1.0",
-    			"meta" : 
+    			"meta" :
 					{
-      					"name": "wikimedia-content-adapter",
-      					"source": "https://github.com/schul-cloud/wikimedia-content-adapter",
-      					"description": "This is an adpter for media-file search on wikimedia."
+   	   					"name": "wikimedia-content-adapter",
+   	   					"source": "https://github.com/schul-cloud/wikimedia-content-adapter",
+   	   					"description": "This is an adpter for media-file search on wikimedia."
     				}
-  			},
-  		"links": 
-			{
-				"self": 
-					{
-      					"href": "http://url.used.to/get/this/document?page[offset]=15&page[limit]=5",
-      					"meta": 
+  				},
+  			"links":
+				{
+					"self":
+							{
+   	   					"href": "http://url.used.to/get/this/document?page[offset]=15&page[limit]=5",
+   	   					"meta":
 							{
         						"count": 0,
         						"offset": 0,
         						"limit": 0
       						}
     				},
-    			"first": "http://url.used.to/get/this/document?page[offset]=0&page[limit]=5",
-				"last": "http://url.used.to/get/this/document?page[offset]=50&page[limit]=5",
-    			"prev": "http://url.used.to/get/this/document?page[offset]=10&page[limit]=5",
-    			"next": "http://url.used.to/get/this/document?page[offset]=20&page[limit]=5"
-  			},
-			"data" : []
-			};
+   	 			"first": "http://url.used.to/get/this/document?page[offset]=0&page[limit]=5",
+					"last": "http://url.used.to/get/this/document?page[offset]=50&page[limit]=5",
+   	 			"prev": "http://url.used.to/get/this/document?page[offset]=10&page[limit]=5",
+   	 			"next": "http://url.used.to/get/this/document?page[offset]=20&page[limit]=5"
+  				},
+				"data" : []
+	};
 
 
-var createURL = {
-	fileList : function(){
-		filenames.requestURL = apiURL +"?"+ filenames.URLparams.join("&");
-		return filenames.requestURL;
-	},
-
-
-	 fileInfos : function(){
-		fileinfos.URLparams.push("iiprop=" + fileinfos.props.join("%7C"));
-		fileinfos.URLparams.push("titles=" + filenames.data.join("%7C"));
-		fileinfos.requestURL = apiURL +"?"+ fileinfos.URLparams.join("&");
-		return  fileinfos.requestURL ;
-	}
-	
-}
-
-module.exports = {
-	use : function(query,response,serveradresse ){
-			res = response;
-			host.address = serveradresse;
-			filenames.URLparams.push("srsearch="+query.q);
-			var filter = query.filter;
-			for( filterParam in filter	){
-				filters.push(
-					{
-						name:filterParam,
-						value:filter[key]
-					} 
-				);
-			}
-			result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
-			result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
+	var createURL = {
+		fileList : function(){
+			filenames.requestURL = apiURL +"?"+ filenames.URLparams.join("&");
+			return filenames.requestURL;
 		},
-	makeRequest: function(){
+
+
+	 	fileInfos : function(){
+			fileinfos.URLparams.push("iiprop=" + fileinfos.props.join("%7C"));
+			fileinfos.URLparams.push("titles=" + filenames.data.join("%7C"));
+			fileinfos.requestURL = apiURL +"?"+ fileinfos.URLparams.join("&");
+			return  fileinfos.requestURL ;
+		}
+
+	};
+
+		host.address = serveradresse;
+		filenames.URLparams.push("srsearch="+query.q);
+		var filterQuery = query.filter;
+		console.log(JSON.stringify(filterQuery));
+			for( filterParam in filterQuery	){
+			filter.count++ ;
+			console.log(filterParam +"\t"+filterQuery[filterParam])
+			filter.data.push(
+				{
+					name:filterParam,
+					value:filterQuery[filterParam]
+				}
+			);
+		}
+		if (query.page.limit != undefined)
+			result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
+		if (query.page.offset != undefined)
+			result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
+
+	this.execute = function(){
 		// create an request-promise
 		var rpFiles = require('request-promise');
 
@@ -112,6 +136,7 @@ module.exports = {
 				var files = resultObject.query.search;
 				for(var index in files){
 						filenames.data.push(utils.prepear4URL(files[index].title));
+
 				}
 				rpFileInfo = require('request-promise')(createURL.fileInfos())
 					.then((requesResult) =>{
@@ -133,18 +158,23 @@ module.exports = {
 								outputObj.duration_unit= "sec";
 								outputObj.contentCategory = "a";
 								outputObj.mimeType = InfoforFile.imageinfo[0].mime;
-								outputObj.license = {};
+								outputObj.license = {
+									value: "unknow",
+									copyrighted : false};
 								if(InfoforFile.imageinfo[0].extmetadata.License != undefined)
 									outputObj.license.value = InfoforFile.imageinfo[0].extmetadata.License.value;
-										
+
 								if(InfoforFile.imageinfo[0].extmetadata.Copyrighted != undefined)
 									outputObj.license.copyrighted = InfoforFile.imageinfo[0].extmetadata.Copyrighted.value;
-								
-								if (pageParams.offset <= 0 && result.links.self.meta.count < result.links.self.meta.limit){
-									result.data.push(outputObj);
+
+								if(filter.validate(outputObj)){
 									result.links.self.meta.count++;
-								}else 
-									pageParams.offset--;
+									if (pageParams.offset <= 0 && result.links.self.meta.limit > result.data.length){
+										result.data.push(outputObj);
+
+									}else
+										pageParams.offset--;
+								}
 							}
 						var offset = result.links.self.meta.offset;
 						var limit  = result.links.self.meta.limit;
@@ -159,19 +189,24 @@ module.exports = {
 						})
 					.catch((err) => {
 						console.log(err);
-						res.send(JSON.stringify(result));
+						res.send(JSON.stringify(err));//JSON.stringify(result));
 					});
 
 			})
 			.catch((err) => {
 				console.log(err);
-				res.send(JSON.stringify(result));
+				res.send(JSON.stringify(err));//result));
 			});
-
-
+			return rpFiles;
 		}
+		return this;
+}
 
-	}
+module.exports = {
+	getRequest : function(query,response,serveradresse ){
+		return Request(query,response,serveradresse );
+		}
+	};
 
 
 

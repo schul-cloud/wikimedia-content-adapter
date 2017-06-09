@@ -1,18 +1,19 @@
 var express = require('express');
 var app = express();
 var utils = require("./utils.js");
+var wait = require("wait.for");
 
 /*
 	this function parse the url GET parameters from the URL
 	href = the URL to parsing the parameters.
 */
 
+
 app.get("/dev/",function(req,res){
-   	var fullUrl = req.protocol + '://' + req.get('host') + req.path;
-	var wikimedia = require("./wikimedia.js");
-	wikimedia.use(req.query,res,fullUrl);
-	wikimedia.makeRequest();
-})
+   var fullUrl = req.protocol + '://' + req.get('host') + req.path;
+	var wikimedia = require("./wikimedia.js").getRequest(req.query,res,fullUrl);
+	wikimedia.execute();
+});
 
 
 var server = app.listen(3000,"localhost", function () {
