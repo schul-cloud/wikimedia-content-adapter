@@ -5,17 +5,41 @@ function Request(query,response,serveradresse ){
 
 	var res = response;
 	var filenames = {
-		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=25"],
+		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=50"],
 		requestURL : "",
 		data : []
 	}
 
-
-	 var fileinfos = {
+	var fileinfos = {
 		requestURL : "",
 		URLparams : ["action=query","format=json","prop=imageinfo&"],
 		props : ["timestamp","user","url","size","mime","mediatype","dimensions","metadata","commonmetadata","extmetadata"],
-		data : []
+		data : [],
+		convert : function(InfoforFile){
+			var outputObj = {};
+			outputObj.title = InfoforFile.title.replace("File:","");
+			outputObj.url = InfoforFile.imageinfo[0].url;
+			outputObj.size = {
+				value: InfoforFile.imageinfo[0].size,
+				unit: "byte",
+				width: InfoforFile.imageinfo[0].width,
+				height: InfoforFile.imageinfo[0].height
+			};
+			outputObj.duration = InfoforFile.imageinfo[0].duration;
+			outputObj.duration_unit= "sec";
+			outputObj.contentCategory = "a";
+			outputObj.mimeType = InfoforFile.imageinfo[0].mime;
+			outputObj.license = {
+				value: "unknow",
+				copyrighted : false
+			};
+			if(InfoforFile.imageinfo[0].extmetadata.License != undefined)
+				outputObj.license.value = InfoforFile.imageinfo[0].extmetadata.License.value;
+
+			if(InfoforFile.imageinfo[0].extmetadata.Copyrighted != undefined)
+				outputObj.license.copyrighted = InfoforFile.imageinfo[0].extmetadata.Copyrighted.value;
+			return outputObj;
+		}
 	};
 	var searchKeyword = "";
 	var filter = {
@@ -145,33 +169,11 @@ function Request(query,response,serveradresse ){
 						var InfosforFiles = InfosforFiles.query.pages;
 						for(var index in InfosforFiles){
 							var InfoforFile = InfosforFiles[index];
-							var outputObj = {};
-								outputObj.title = InfoforFile.title.replace("File:","");
-								outputObj.url = InfoforFile.imageinfo[0].url;
-								outputObj.size = {
-									value: InfoforFile.imageinfo[0].size,
-									unit: "byte",
-									width: InfoforFile.imageinfo[0].width,
-									height: InfoforFile.imageinfo[0].height
-								};
-								outputObj.duration = InfoforFile.imageinfo[0].duration;
-								outputObj.duration_unit= "sec";
-								outputObj.contentCategory = "a";
-								outputObj.mimeType = InfoforFile.imageinfo[0].mime;
-								outputObj.license = {
-									value: "unknow",
-									copyrighted : false};
-								if(InfoforFile.imageinfo[0].extmetadata.License != undefined)
-									outputObj.license.value = InfoforFile.imageinfo[0].extmetadata.License.value;
-
-								if(InfoforFile.imageinfo[0].extmetadata.Copyrighted != undefined)
-									outputObj.license.copyrighted = InfoforFile.imageinfo[0].extmetadata.Copyrighted.value;
-
+							var outputObj = fileinfos.convert(InfoforFile);
 								if(filter.validate(outputObj)){
 									result.links.self.meta.count++;
 									if (pageParams.offset <= 0 && result.links.self.meta.limit > result.data.length){
 										result.data.push(outputObj);
-
 									}else
 										pageParams.offset--;
 								}
@@ -203,8 +205,9 @@ function Request(query,response,serveradresse ){
 }
 
 module.exports = {
-	getRequest : function(query,response,serveradresse ){
-		return Request(query,response,serveradresse );
+	getRequest :
+		function(query,response,serveradresse ){
+			return Request(query,response,serveradresse );
 		}
 	};
 
