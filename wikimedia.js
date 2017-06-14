@@ -1,5 +1,4 @@
 const apiURL = 'https://commons.wikimedia.org/w/api.php'; // the url form the Wikimedia Rest api.
-const utils = require("./utils.js");
 
 function Request(query,response,serveradresse ){
 
@@ -159,7 +158,7 @@ function Request(query,response,serveradresse ){
 			.then((resultObject) => {
 				var files = resultObject.query.search;
 				for(var index in files){
-						filenames.data.push(utils.prepear4URL(files[index].title));
+						filenames.data.push(encodeURIComponent(files[index].title));
 
 				}
 				rpFileInfo = require('request-promise')(createURL.fileInfos())
