@@ -8,7 +8,7 @@ function Request(query,response,serveradresse ){
 
 	var res = response;
 	var filenames = {
-		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=10"],
+		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=15"],
 		requestURL : "",
 		data : []
 	}
@@ -72,6 +72,7 @@ function Request(query,response,serveradresse ){
 	var host = {
 		address : "",
 		createRequestAdress : function(limits,offset){
+		if(offset < 0 ) offset = 0;
 		var queryTemp = ["q="+searchKeyword];
 			for(var filterparam in filter.data)
 				queryTemp.push("filter["+filterparam.name +"]="+filterparam.value);
@@ -142,9 +143,10 @@ function Request(query,response,serveradresse ){
 				}
 			);
 		}
-		if(query.page)
+		if(query.page){
 				result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
 				result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
+		}
 
 	this.execute = function(){
 		// create an request-promise
@@ -181,11 +183,10 @@ function Request(query,response,serveradresse ){
 						var limit  = result.links.self.meta.limit;
 						result.links.first = host.createRequestAdress(limit,0);
 						result.links.self.href = host.createRequestAdress(limit,offset);
-						offset -=  limit;
-						result.links.prev = host.createRequestAdress(limit,offset);
-						offset +=  (limit*2);
-						result.links.next = host.createRequestAdress(limit,offset);
-						result.links.last = host.createRequestAdress(limit,50);
+						result.links.prev = host.createRequestAdress(limit,offset-limit);
+						result.links.next = host.createRequestAdress(limit,offset+ limit);
+						var count = result.links.self.meta.count;
+						result.links.last = host.createRequestAdress(limit,Math.floor(count/limit)*limit);
 
 						console.log("request duration = " + (Date.now()- start) + " ms ");
 						res.send(JSON.stringify(result));
