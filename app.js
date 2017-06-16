@@ -1,6 +1,5 @@
 var express = require('express');
 var app = express();
-var utils = require("./utils.js");
 var wait = require("wait.for");
 
 /*

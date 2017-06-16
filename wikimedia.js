@@ -2,9 +2,13 @@ const apiURL = 'https://commons.wikimedia.org/w/api.php'; // the url form the Wi
 
 function Request(query,response,serveradresse ){
 
+	var dataContainer = {
+	//	result :
+	}
+
 	var res = response;
 	var filenames = {
-		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=50"],
+		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=10"],
 		requestURL : "",
 		data : []
 	}
@@ -49,15 +53,12 @@ function Request(query,response,serveradresse ){
 					case ("size"):
 					case ("license"):
 						valid = valid && resultObject[filter.data[i].name].value == filter.data[i].value;
-						console.log(resultObject[filter.data[i].name].value +"\t" + filter.data[i].value );
 						break;
 					default:
 						valid = valid && resultObject[filter.data[i].name] == filter.data[i].value;
 						break;
 				}
-				console.log(valid);
 			}
-			console.log(resultObject["title"] + "\t" +valid );
 			return valid;
 		},
 		count : 0 ,
@@ -99,7 +100,7 @@ function Request(query,response,serveradresse ){
 							{
         						"count": 0,
         						"offset": 0,
-        						"limit": 0
+        						"limit": 10
       						}
     				},
    	 			"first": "http://url.used.to/get/this/document?page[offset]=0&page[limit]=5",
@@ -141,15 +142,15 @@ function Request(query,response,serveradresse ){
 				}
 			);
 		}
-		if (query.page.limit != undefined)
-			result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
-		if (query.page.offset != undefined)
-			result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
+		if(query.page)
+				result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
+				result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
 
 	this.execute = function(){
 		// create an request-promise
 		var rpFiles = require('request-promise');
 
+		var start = Date.now();
 
 		rpFiles(createURL.fileList())
 			.then((requestResult) => {
@@ -159,9 +160,8 @@ function Request(query,response,serveradresse ){
 				var files = resultObject.query.search;
 				for(var index in files){
 						filenames.data.push(encodeURIComponent(files[index].title));
-
 				}
-				rpFileInfo = require('request-promise')(createURL.fileInfos())
+					rpFileInfo = require('request-promise')(createURL.fileInfos())
 					.then((requesResult) =>{
 						return JSON.parse(requesResult);
 					}).then((InfosforFiles)=>{
@@ -186,13 +186,14 @@ function Request(query,response,serveradresse ){
 						offset +=  (limit*2);
 						result.links.next = host.createRequestAdress(limit,offset);
 						result.links.last = host.createRequestAdress(limit,50);
+
+						console.log("request duration = " + (Date.now()- start) + " ms ");
 						res.send(JSON.stringify(result));
 						})
 					.catch((err) => {
 						console.log(err);
 						res.send(JSON.stringify(err));//JSON.stringify(result));
 					});
-
 			})
 			.catch((err) => {
 				console.log(err);
