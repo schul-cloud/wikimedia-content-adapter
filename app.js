@@ -7,15 +7,29 @@ var wait = require("wait.for");
 	href = the URL to parsing the parameters.
 */
 
-
-app.get("/dev/",function(req,res){
+var address = "localhost";
+var port = 3000;
+console.log(process.argv);
+if(process.argv.length > 2){
+	for(var i = 2 ; i < process.argv.length ; i++){
+		switch (process.argv[i]){
+		case "-port" :
+			port = process.argv[++i];
+			break;
+		case "-address" :
+			address = process.argv[++i];
+			break;
+		}
+	}
+}
+app.get("/v1/",function(req,res){
    var fullUrl = req.protocol + '://' + req.get('host') + req.path;
 	var wikimedia = require("./wikimedia.js").getRequest(req.query,res,fullUrl);
 	wikimedia.execute();
 });
 
 
-var server = app.listen(3000,"localhost", function () {
+var server = app.listen(port,address, function () {
 
   var host = server.address().address
   var port = server.address().port
