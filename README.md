@@ -2,21 +2,21 @@
 
 ## Get started
 
-After clone this repo. Go inside the dictory and run :
+After clone this repo go inside the directory and run :
 
 		npm install
 
-too start the service on default configureation run:
+To start the service on default configurations run:
 
 		npm start
 
-the Service will listen on localhost:3000.
+The Service will listen on localhost:3000.
 
-If you want to run him under an other port/address run:
+If you want to run it under an other port/address run:
 
-		nodejs app.js -address address-for-listening -port port-for-listening
+		nodejs app.js -address address-to-listen-on -port port-to-listen-on
 
-when runnig without params port or address will be default
+When running without params port or address will be default
 
 ## Code Example
 
@@ -27,9 +27,9 @@ when runnig without params port or address will be default
 Query params:
 
 -	q = query value for searching.
--	page[limit] = max cout of result elements.
+-	page[limit] = max number of result elements.
 -	page[offset] = offset of the result elements.
--	filer[filterKey] = filter for the result. The filterKey must be an key of the result object
+-	filer[filterKey] = filter for the result. The filterKey must be an key of the result object.
 
 ## License
 
