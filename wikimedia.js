@@ -5,7 +5,6 @@ function Request(query,response,serveradresse ){
 	var dataContainer = {
 	//	result :
 	}
-
 	var res = response;
 	var filenames = {
 		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=15"],
@@ -28,6 +27,12 @@ function Request(query,response,serveradresse ){
 				width: InfoforFile.imageinfo[0].width,
 				height: InfoforFile.imageinfo[0].height
 			};
+			outputObj.description = "";
+			if(InfoforFile.imageinfo[0].extmetadata.Credit != undefined)
+				outputObj.description = InfoforFile.imageinfo[0].extmetadata.Credit.value;
+			if(InfoforFile.imageinfo[0].extmetadata.ImageDescription != undefined)
+				outputObj.description = InfoforFile.imageinfo[0].extmetadata.ImageDescription.value;
+
 			outputObj.duration = InfoforFile.imageinfo[0].duration;
 			outputObj.duration_unit= "sec";
 			outputObj.contentCategory = "a";
