@@ -1,17 +1,21 @@
 const apiURL = 'https://commons.wikimedia.org/w/api.php'; // the url form the Wikimedia Rest api.
 
+// create a new Request object which has all necessary function an objects vor make an request on wikimedia
 function Request(query,response,serveradresse ){
 
 	var dataContainer = {
 	//	result :
 	}
-	var res = response;
+	var res = response;	// respons object
+
+	// container for all filenames which get from wikimedia (unfiltert)
 	var filenames = {
 		URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=15"],
 		requestURL : "",
 		data : []
 	}
 
+	// container for all fileinfos form the Filenames in "filenames" which get from wikimedia
 	var fileinfos = {
 		requestURL : "",
 		URLparams : ["action=query","format=json","prop=imageinfo&"],
@@ -49,7 +53,10 @@ function Request(query,response,serveradresse ){
 			return outputObj;
 		}
 	};
+
 	var searchKeyword = "";
+
+	//handle filtering
 	var filter = {
 		validate : function(resultObject){
 			var valid = true ;
@@ -69,11 +76,12 @@ function Request(query,response,serveradresse ){
 		count : 0 ,
 		data : []
 	};
+	// pageParams Container
 	var pageParams = {
-		limit : 10,
-		offset : 0,
+		limit : 10, // default limit
+		offset : 0	// default offset
 	};
-
+	// handle host functions
 	var host = {
 		address : "",
 		createRequestAdress : function(limits,offset){
@@ -86,6 +94,7 @@ function Request(query,response,serveradresse ){
 			return this.address +"?"+ queryTemp.join("&");
 		}
 	};
+	// The result object which send as response.
 	var result = {
   			"jsonapi":
 				{
@@ -117,7 +126,7 @@ function Request(query,response,serveradresse ){
 				"data" : []
 	};
 
-
+	// handle request-urls for Wikimedia.
 	var createURL = {
 		fileList : function(){
 			filenames.requestURL = apiURL +"?"+ filenames.URLparams.join("&");
@@ -133,9 +142,10 @@ function Request(query,response,serveradresse ){
 		}
 
 	};
-
+	// init form Consturctor
 		host.address = serveradresse;
-		filenames.URLparams.push("srsearch="+query.q);
+		searchKeyword = query.q;
+		filenames.URLparams.push("srsearch="+searchKeyword);
 		var filterQuery = query.filter;
 		console.log(JSON.stringify(filterQuery));
 			for( filterParam in filterQuery	){
@@ -152,7 +162,7 @@ function Request(query,response,serveradresse ){
 				result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
 				result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
 		}
-
+// execute the request and send the response.
 	this.execute = function(){
 		// create an request-promise
 		var rpFiles = require('request-promise');

@@ -1,15 +1,11 @@
-var express = require('express');
-var app = express();
-var wait = require("wait.for");
+var express = require('express');		// the restframework
+var app = express();							// create the webapplication
 
-/*
-	this function parse the url GET parameters from the URL
-	href = the URL to parsing the parameters.
-*/
-
+// default value for Address an Port
 var address = "localhost";
 var port = 3000;
-console.log(process.argv);
+
+// if necessary parse new port and/or address.
 if(process.argv.length > 2){
 	for(var i = 2 ; i < process.argv.length ; i++){
 		switch (process.argv[i]){
@@ -22,9 +18,11 @@ if(process.argv.length > 2){
 		}
 	}
 }
+
+// routing for api-v1 : version 1
 app.get("/v1/",function(req,res){
    var fullUrl = req.protocol + '://' + req.get('host') + req.path;
-	var wikimedia = require("./wikimedia.js").getRequest(req.query,res,fullUrl);
+	var wikimedia = require("./wikimedia.js").getRequest(req.query,res,fullUrl);	// create a new wikimedia-Request
 	wikimedia.execute();
 });
 
