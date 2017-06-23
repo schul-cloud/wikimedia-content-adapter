@@ -35,7 +35,7 @@ function Request(query,response,serveradresse,version ){
 	switch (version){
 		case 1 :
 			linkcreator.address = serveradresse;
-			searchKeyword = encodeURIComponent(query.q);
+			searchKeyword = encodeURIComponent(query.Q);
 			filenames.URLparams.push("srsearch="+searchKeyword);
 			var filterQuery = query.filter;
 			console.log(JSON.stringify(filterQuery));
