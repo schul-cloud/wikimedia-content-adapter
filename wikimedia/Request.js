@@ -38,10 +38,8 @@ function Request(query,response,serveradresse,version ){
 			searchKeyword = encodeURIComponent(query.Q);
 			filenames.URLparams.push("srsearch="+searchKeyword);
 			var filterQuery = query.filter;
-			console.log(JSON.stringify(filterQuery));
-				for( filterParam in filterQuery	){
+			for( filterParam in filterQuery	){
 				filter.count++ ;
-				console.log(filterParam +"\t"+filterQuery[filterParam])
 				filter.data.push(
 					{
 						name:filterParam,
@@ -60,8 +58,6 @@ function Request(query,response,serveradresse,version ){
 		// create an request-promise
 		var rpFiles = require('request-promise');
 
-		var start = Date.now();
-
 		rpFiles(createURL.fileList(filenames))
 			.then((requestResult) => {
 				return JSON.parse(requestResult);
@@ -79,24 +75,23 @@ function Request(query,response,serveradresse,version ){
 						for(var index in InfosforFiles){
 							var InfoforFile = InfosforFiles[index];
 							var outputObj = fileinfos.convert(InfoforFile);
+							var cValidObjs = 0;
 								if(filter.validate(outputObj)){
-									result.links.self.meta.count++;
+									cValidObjs++;
 									if (pageParams.offset <= 0 && result.links.self.meta.limit > result.data.length){
+										result.links.self.meta.count++;
 										result.data.push(outputObj);
 									}else
 										pageParams.offset--;
 								}
 							}
-							var count = result.links.self.meta.count;
-
 						linkcreator.fillLinks(
 										result.links.self.meta.limit,
 										result.links.self.meta.offset,
-										result.links.self.meta.count,
+										cValidObjs,
 										searchKeyword,
 										filter,
 										result.links);
-						console.log("request duration = " + (Date.now()- start) + " ms ");
 						res.send(JSON.stringify(result));
 						})
 					.catch((err) => {

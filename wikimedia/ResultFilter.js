@@ -5,13 +5,12 @@ function Filter(version){
 				validate : function(resultObject){
 					var valid = true ;
 					for( var i = 0 ; i < this.count; i++){
-						switch (filter.data[i].name){
-							case ("size"):
+						switch (this.data[i].name){
 							case ("license"):
-								valid = valid && resultObject[filter.data[i].name].value == filter.data[i].value;
+								valid = valid && resultObject[this.data[i].name].value == this.data[i].value;
 								break;
 							default:
-								valid = valid && resultObject[filter.data[i].name] == filter.data[i].value;
+								valid = valid && resultObject[this.data[i].name] == this.data[i].value;
 								break;
 						}
 					}

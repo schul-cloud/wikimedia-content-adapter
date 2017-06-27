@@ -1,8 +1,24 @@
 
 
-module.exports = {
-	getResultObject :
-		function(version){
+function RequestDataObject(version){
+			switch(version){
+				case 1 : return {
+					"type": "resource",
+					"id": "resource-1",
+					"attributes": {
+					  "title": "Example Website",
+					  "url": "https://example.org",
+					  "licenses": [],
+					  "mimeType": "text/html",
+					  "contentCategory": "a",
+      			  "languages": ["de"]
+			      }
+    			}
+			}
+}
+
+
+function RequestObject(version){
 			switch(version){
 				case 1 : return {
 				  			"jsonapi":
@@ -35,6 +51,17 @@ module.exports = {
 								"data" : []
 					}
 			}
+}
+
+
+module.exports = {
+	getResultObject :
+		function(version){
+			return RequestObject(version);
+		},
+	getResultDataObject :
+		function(version){
+			return RequestDataObject(version);
 		}
 }
 	

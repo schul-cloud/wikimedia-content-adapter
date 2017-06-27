@@ -4,7 +4,7 @@ function Filenames(version){
 		case 1:
 	//	default :
 			return  {
-				URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=15"],
+				URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=25"],
 				requestURL : "",
 				data : []
 			}

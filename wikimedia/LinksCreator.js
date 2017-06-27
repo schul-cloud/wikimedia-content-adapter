@@ -11,9 +11,10 @@ function LinksCreator(version){
 					queryTemp.push("page[offset]=" + offset);
 					return this.address +"?"+ queryTemp.join("&");
 				},
-				fillLinks : function(limit, offset , count, searchKeyword , filter ,links ){
+
+				fillLinks : function(limit, offset , maxValidObjs, searchKeyword , filter ,links ){
 				// Compute Offsets
-						var lastOffset = Math.floor(count/limit)*limit
+						var lastOffset = Math.floor(maxValidObjs/limit)*limit
 						var nextOffset = ((offset + limit)< lastOffset) ? offset + limit : lastOffset;
 						var prevOffset = offset - limit
 				// fill the links
