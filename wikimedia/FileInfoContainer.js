@@ -64,6 +64,10 @@ function getLicense(license , copyrighted){
 	return licenseObj;
 }
 
+function fixLinks(text){
+
+}
+
 module.exports.getFileInfoContainer = function(version){
 	return FileInfos(version);
 }

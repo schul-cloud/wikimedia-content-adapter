@@ -11,7 +11,7 @@ function RequestDataObject(version){
 					  "licenses": [],
 					  "mimeType": "text/html",
 					  "contentCategory": "a",
-      			  "languages": ["de"]
+      			"languages": ["de"]
 			      }
     			}
 			}
