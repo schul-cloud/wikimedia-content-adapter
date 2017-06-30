@@ -5,8 +5,9 @@ function LinksCreator(version){
 				createRequestAdress : function(limits , offset , searchKeyword , filter){
 					if(offset < 0 ) offset = 0;
 					var queryTemp = ["q="+searchKeyword];
-					for(var filterparam in filter.data)
-						queryTemp.push("filter["+filterparam.name +"]="+filterparam.value);
+					for(var filterparam in filter.data){
+						queryTemp.push("filter["+ filter.data[filterparam].name +"]="+ filter.data[filterparam].value);
+					}
 					queryTemp.push("page[limit]="  + limits);
 					queryTemp.push("page[offset]=" + offset);
 					return this.address +"?"+ queryTemp.join("&");
