@@ -4,7 +4,7 @@ function LinksCreator(version){
 				address : "",
 				createRequestAdress : function(limits , offset , searchKeyword , filter){
 					if(offset < 0 ) offset = 0;
-					var queryTemp = ["q="+searchKeyword];
+					var queryTemp = ["Q="+searchKeyword];
 					for(var filterparam in filter.data){
 						queryTemp.push("filter["+ filter.data[filterparam].name +"]="+ filter.data[filterparam].value);
 					}
@@ -16,14 +16,17 @@ function LinksCreator(version){
 				fillLinks : function(limit, offset , maxValidObjs, searchKeyword , filter ,links ){
 				// Compute Offsets
 						var lastOffset = Math.floor(maxValidObjs/limit)*limit
-						var nextOffset = ((offset + limit)< lastOffset) ? offset + limit : lastOffset;
+						if (lastOffset == maxValidObjs ) lastOffset -= limit;
+						var nextOffset = parseInt(offset) + parseInt(limit);
+						if (nextOffset > lastOffset) nextOffset = lastOffset;
+
 						var prevOffset = offset - limit
 				// fill the links
 						links.first 		= this.createRequestAdress(limit,0,searchKeyword,filter);
 						links.self.href 	= this.createRequestAdress(limit,offset,searchKeyword,filter);
-						links.prev 			= this.createRequestAdress(limit,prevOffset,searchKeyword,filter);
-						links.next 			= this.createRequestAdress(limit,nextOffset,searchKeyword,filter);
-						links.last 			= this.createRequestAdress(limit,lastOffset,searchKeyword,filter);
+						links.prev 			= (prevOffset >= 0 ) ? this.createRequestAdress(limit,prevOffset,searchKeyword,filter) : null;
+						links.next 			= (nextOffset > offset) ? this.createRequestAdress(limit,nextOffset,searchKeyword,filter) : null;
+						links.last 			= (nextOffset > offset) ? this.createRequestAdress(limit,lastOffset,searchKeyword,filter) : null;
 
 
 				}

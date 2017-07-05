@@ -21,7 +21,7 @@ if(process.argv.length > 2){
 
 // routing for api-v1 : version 1
 app.get("/v1/",function(req,res){
-   var fullUrl = req.protocol + '://' + req.get('host') + req.path;
+   var fullUrl = req.protocol + '://' + address +":" + port + req.path;
 	var wikimedia = require("./wikimedia/Request.js").getRequest(req.query,res,fullUrl,1);	// create a new wikimedia-Request
 	wikimedia.execute();
 });
