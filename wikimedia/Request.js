@@ -10,6 +10,7 @@ function Request(query,response,serveradresse,version ){
 	};
 
 	var searchKeyword = "";
+	var status = 200;
 
 	var res = response;	// respons object
 
@@ -35,8 +36,16 @@ function Request(query,response,serveradresse,version ){
 	switch (version){
 		case 1 :
 			linkcreator.address = serveradresse;
+			console.log(query);
+			if (query.Q == undefined ) status = 400;
 			searchKeyword = encodeURIComponent(query.Q);
 			filenames.URLparams.push("srsearch="+searchKeyword);
+			for(var element in query){
+				if(!(element =="Q" || element == "page" || element == "filter")) {
+					status = 400;
+					console.log(element);
+				}
+			}
 			var filterQuery = query.filter;
 			for( filterParam in filterQuery	){
 				filter.count++ ;
@@ -51,14 +60,14 @@ function Request(query,response,serveradresse,version ){
 					result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
 					result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
 			}
+			if (pageParams.limit <= 0 || pageParams.offset < 0) status = 404;
 	}
 
 // execute the request and send the response.
 	this.execute = function(){
 		// create an request-promise
 		var rpFiles = require('request-promise');
-
-		rpFiles(createURL.fileList(filenames))
+			rpFiles(createURL.fileList(filenames))
 			.then((requestResult) => {
 				return JSON.parse(requestResult);
 			})
@@ -72,19 +81,19 @@ function Request(query,response,serveradresse,version ){
 						return JSON.parse(requesResult);
 					}).then((InfosforFiles)=>{
 						var InfosforFiles = InfosforFiles.query.pages;
+						var cValidObjs = 0;
 						for(var index in InfosforFiles){
 							var InfoforFile = InfosforFiles[index];
 							var outputObj = fileinfos.convert(InfoforFile);
-							var cValidObjs = 0;
-								if(filter.validate(outputObj)){
-									cValidObjs++;
-									if (pageParams.offset <= 0 && result.links.self.meta.limit > result.data.length){
-										result.links.self.meta.count++;
-										result.data.push(outputObj);
-									}else
-										pageParams.offset--;
-								}
+							if ( filter.validate(outputObj) ){
+								cValidObjs += 1;
+								if (pageParams.offset <= 0 && result.links.self.meta.limit > result.data.length){
+									result.links.self.meta.count++;
+									result.data.push(outputObj);
+								}else
+									pageParams.offset--;
 							}
+						}
 						linkcreator.fillLinks(
 										result.links.self.meta.limit,
 										result.links.self.meta.offset,
@@ -92,6 +101,10 @@ function Request(query,response,serveradresse,version ){
 										searchKeyword,
 										filter,
 										result.links);
+					//	console.log(result);
+						if (cValidObjs == 0) status = 404;
+						console.log(status);
+						if (status  != 200) result = require("./ResponseObject.js").getErrorResponse(1 , status);
 						res.send(JSON.stringify(result));
 						})
 					.catch((err) => {

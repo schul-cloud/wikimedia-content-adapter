@@ -17,7 +17,6 @@ function RequestDataObject(version){
 			}
 }
 
-
 function RequestObject(version){
 			switch(version){
 				case 1 : return {
@@ -52,7 +51,42 @@ function RequestObject(version){
 					}
 			}
 }
+function getErrorMessage(status){
+	var msg = {};
 
+	msg.status = 400;
+	switch (status){
+		case 400 :
+			msg.title = "Bad Request";
+			msg.detail = "invalid parameter";
+			break;
+		case 404 :
+		default :
+			msg.title = "Not Found";
+			msg.status = 404
+			msg.detail =  "The requested resource could not be found.";
+			break;
+	}
+	return msg;
+}
+
+function getError(status){
+
+	var error = {
+			  "jsonapi": {
+				"version" : "1.0",
+				"meta": {
+				  "name" : "Test Server Response",
+				  "source" : "https://github.com/schul-cloud/resources-api-v1/issues/42",
+				  "description": "This is a test server yielding an error."
+				}
+			  },
+			  "errors": []
+			};
+	error.errors.push(getErrorMessage(status));
+	return error;
+
+}
 
 module.exports = {
 	getResultObject :
@@ -62,6 +96,9 @@ module.exports = {
 	getResultDataObject :
 		function(version){
 			return RequestDataObject(version);
-		}
+		},
+	getErrorResponse : function(version,status){
+		return getError(status);
+	}
 }
 	
