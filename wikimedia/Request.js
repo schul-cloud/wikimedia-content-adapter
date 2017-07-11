@@ -64,61 +64,54 @@ function Request(query,response,serveradresse,version ){
 	}
 
 // execute the request and send the response.
-	this.execute = function(){
+	this.execute = function() {
 		// create an request-promise
 		var rpFiles = require('request-promise');
-			rpFiles(createURL.fileList(filenames))
-			.then((requestResult) => {
+		rpFiles(createURL.fileList(filenames)).then(function(requestResult){
 				return JSON.parse(requestResult);
-			})
-			.then((resultObject) => {
-				var files = resultObject.query.search;
-				for(var index in files){
-						filenames.data.push(encodeURIComponent(files[index].title));
+		}).then(function(resultObject){
+			var files = resultObject.query.search;
+			for(var index in files){
+				filenames.data.push(encodeURIComponent(files[index].title));
+			}
+			rpFileInfo = require('request-promise')(createURL.fileInfos(filenames,fileinfos)).then(function(requesResult){
+				return JSON.parse(requesResult);
+			}).then(function(InfosforFiles){
+				var InfosforFiles = InfosforFiles.query.pages;
+				var cValidObjs = 0;
+				for(var index in InfosforFiles){
+					var InfoforFile = InfosforFiles[index];
+					var outputObj = fileinfos.convert(InfoforFile);
+					if ( filter.validate(outputObj) ){
+						cValidObjs += 1;
+					if (pageParams.offset <= 0 && result.links.self.meta.limit > result.data.length){
+						result.links.self.meta.count++;
+						result.data.push(outputObj);
+					}else
+						pageParams.offset--;
+					}
 				}
-					rpFileInfo = require('request-promise')(createURL.fileInfos(filenames,fileinfos))
-					.then((requesResult) =>{
-						return JSON.parse(requesResult);
-					}).then((InfosforFiles)=>{
-						var InfosforFiles = InfosforFiles.query.pages;
-						var cValidObjs = 0;
-						for(var index in InfosforFiles){
-							var InfoforFile = InfosforFiles[index];
-							var outputObj = fileinfos.convert(InfoforFile);
-							if ( filter.validate(outputObj) ){
-								cValidObjs += 1;
-								if (pageParams.offset <= 0 && result.links.self.meta.limit > result.data.length){
-									result.links.self.meta.count++;
-									result.data.push(outputObj);
-								}else
-									pageParams.offset--;
-							}
-						}
-						linkcreator.fillLinks(
-										result.links.self.meta.limit,
-										result.links.self.meta.offset,
-										cValidObjs,
-										searchKeyword,
-										filter,
-										result.links);
-					//	console.log(result);
-						if (cValidObjs == 0) status = 404;
-						console.log(status);
-						if (status  != 200) result = require("./ResponseObject.js").getErrorResponse(1 , status);
-						res.send(JSON.stringify(result));
-						})
-					.catch((err) => {
-						console.log(err);
-						res.send(JSON.stringify(err));
-					});
-			})
-			.catch((err) => {
+				linkcreator.fillLinks(
+							result.links.self.meta.limit,
+							result.links.self.meta.offset,
+							cValidObjs,
+							searchKeyword,
+							filter,
+							result.links);
+				if (cValidObjs == 0) status = 404;
+				if (status  != 200) result = require("./ResponseObject.js").getErrorResponse(1 , status);
+					res.send(JSON.stringify(result));
+			}).catch(function(err){
 				console.log(err);
 				res.send(JSON.stringify(err));
 			});
+		}).catch(function(err){
+			console.log(err);
+			res.send(JSON.stringify(err));
+		});
 			return rpFiles;
-		}
-		return this;
+	}
+	return this;
 }
 
 module.exports = {
