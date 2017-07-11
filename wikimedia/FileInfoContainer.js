@@ -13,7 +13,7 @@ function FileInfos(version){
 			convert : function(InfoforFile){
 				var outputObj = require("./ResponseObject.js").getResultDataObject(version);				// init
 
-				outputObj.id = ++this.id_count;
+				outputObj.id = String(++this.id_count);
 				outputObj.attributes.title = InfoforFile.title.replace("File:","");
 				outputObj.attributes.url = InfoforFile.imageinfo[0].url;
 				outputObj.attributes.contextUrl = InfoforFile.imageinfo[0].descriptionurl;
