@@ -26,7 +26,6 @@ function Filter(version){
 							default:
 								valid = valid && resultObject[filterObj.name] == filterObj.value;
 								valid = valid || resultObject[filterObj.name] == undefined;
-								console.log(resultObject[filterObj.name]);
 								break;
 						}
 					}
