@@ -1,7 +1,7 @@
 const apiURL = 'https://commons.wikimedia.org/w/api.php'; // the url form the Wikimedia Rest api.
 
 // create a new Request object which has all necessary function an objects vor make an request on wikimedia
-function Request(query,response,serveradresse,version ){
+function Request(query,version,serveradresse,send,err){
 
 	// pageParams Container
 	var pageParams = {
@@ -11,10 +11,11 @@ function Request(query,response,serveradresse,version ){
 
 	var searchKeyword = "";
 	var status = 200;
+	var sendCallback = send;	// send function as callback            (response)
+    var errCallback = err;	    // send function as callback for Errors (response,status)
 
-	var res = response;	// respons object
 
-	// container for all filenames which get from wikimedia (unfiltert)
+	// container for  filenames which get from wikimedia (unfiltert)
 	var filenames = require("./FileNameContainer.js").getFileNameContainer(version);
 
 	// container for all fileinfos form the Filenames in "filenames" which get from wikimedia
@@ -36,14 +37,12 @@ function Request(query,response,serveradresse,version ){
 	switch (version){
 		case 1 :
 			linkcreator.address = serveradresse;
-			console.log(query);
 			if (query.Q == undefined ) status = 400;
 			searchKeyword = encodeURIComponent(query.Q);
 			filenames.URLparams.push("srsearch="+searchKeyword);
 			for(var element in query){
 				if(!(element =="Q" || element == "page" || element == "filter")) {
 					status = 400;
-					console.log(element);
 				}
 			}
 			var filterQuery = query.filter;
@@ -99,15 +98,17 @@ function Request(query,response,serveradresse,version ){
 							filter,
 							result.links);
 				if (cValidObjs == 0) status = 404;
-				if (status  != 200) result = require("./ResponseObject.js").getErrorResponse(1 , status);
-					res.send(JSON.stringify(result));
+				if (status  == 200) sendCallback(JSON.stringify(result));
+				else            	errCallback(require("./ResponseObject.js").getErrorResponse(version , status),status);
 			}).catch(function(err){
-				console.log(err);
-				res.send(JSON.stringify(err));
+			    status = 500;
+                errCallback(require("./ResponseObject.js").getErrorResponse(version , status),status);
+                console.log(err);
 			});
 		}).catch(function(err){
-			console.log(err);
-			res.send(JSON.stringify(err));
+            status = 500;
+            errCallback(require("./ResponseObject.js").getErrorResponse(version , status),status);
+            console.log(err);
 		});
 			return rpFiles;
 	}
@@ -116,8 +117,8 @@ function Request(query,response,serveradresse,version ){
 
 module.exports = {
 	getRequest :
-		function(query,response,serveradresse,version ){
-			return Request(query,response,serveradresse,version );
+		function(query,version,serveradresse,send,err){
+			return Request(query,version,serveradresse,send,err);
 		}
 	};
 

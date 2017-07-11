@@ -54,16 +54,19 @@ function RequestObject(version){
 function getErrorMessage(status){
 	var msg = {};
 
-	msg.status = 400;
+    msg.status = String(status);
 	switch (status){
 		case 400 :
 			msg.title = "Bad Request";
 			msg.detail = "invalid parameter";
 			break;
+        case 500 :
+            msg.title = "Internal Server Error";
+            msg.detail =  "Something went wrong.";
+            break;
 		case 404 :
 		default :
 			msg.title = "Not Found";
-			msg.status = 404
 			msg.detail =  "The requested resource could not be found.";
 			break;
 	}

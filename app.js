@@ -19,19 +19,26 @@ if(process.argv.length > 2){
 	}
 }
 
+
 // routing for api-v1 : version 1
 app.get("/v1/",function(req,res){
-	res.set({ 'content-type': 'application/json; charset=utf-8' });
+	res.set({ 'content-type': 'application/vnd.api+json' });
    	var fullUrl = req.protocol + '://' + address +":" + port + req.path;
-	var wikimedia = require("./wikimedia/Request.js").getRequest(req.query,res,fullUrl,1);	// create a new wikimedia-Request
+	var wikimedia = require("./wikimedia/Request.js").getRequest(req.query,1,fullUrl,
+        function(response){
+            res.send(response);
+        },function (error , status) {
+            res.status(status);
+            res.send(error);
+        });	// create a new wikimedia-Request
 	wikimedia.execute();
 });
 
 
 var server = app.listen(port,address, function () {
 
-  var host = server.address().address
-  var port = server.address().port
+  var host = server.address().address;
+  var port = server.address().port;
 
   console.log("Example app listening at http://%s:%s", host, port)
 
