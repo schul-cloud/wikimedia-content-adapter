@@ -22,7 +22,7 @@ if(process.argv.length > 2){
 
 // routing for api-v1 : version 1
 app.get("/v1/",function(req,res){
-	res.set({ 'content-type': 'application/vnd.api+json' });
+	res = res.set('content-type', 'application/vnd.api+json');
    	var fullUrl = req.protocol + '://' + address +":" + port + req.path;
 	var wikimedia = require("./wikimedia/Request.js").getRequest(req.query,1,fullUrl,
         function(response){
@@ -34,7 +34,8 @@ app.get("/v1/",function(req,res){
 	wikimedia.execute();
 });
 
-
+process.title = "wikimedia";
+console.log(process.title);
 var server = app.listen(port,address, function () {
 
   var host = server.address().address;

@@ -4,8 +4,11 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js ",
+    "pretest": "node app.js&",
+    "test":  "python3 -m schul_cloud_search_tests.search --url=http://localhost:3000/v1 || :",
+    "posttest": "npm stop",
+    "stop":  "pkill wikimedia"
   },
   "repository": {
     "type": "git",
@@ -16,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/schul-cloud/wikimedia-content-adapter/issues"
   },
-  "homepage": "https://github.com/schul-cloud/wikimedia-content-adapter#readme",
+  "homepage": "https://github.com/schul-cloud/wikimedia-content-adapter#readm e",
   "dependencies": {
     "express": "^4.15.3",
     "request-promise": "^4.2.1",
