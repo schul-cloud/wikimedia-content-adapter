@@ -1,3 +1,5 @@
+![Travis Status](https://travis-ci.org/schul-cloud/wikimedia-content-adapter.svg?branch=master)
+
 # wikimedia-content-adapter
 
 This repository contains a service adapter for querying the [Wikimedia API][wikimedia-api].
