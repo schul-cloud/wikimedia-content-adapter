@@ -1,5 +1,11 @@
 # wikimedia-content-adapter
 
+This repository contains a service adapter for querying the [Wikimedia API][wikimedia-api].
+The service provides the [Schul-Cloud Search API interface][search-api].
+
+[search-api]: https://github.com/schul-cloud/resources-api-v1#search-api
+[wikimedia-api]: https://commons.wikimedia.org/w/api.php
+
 ## Get started
 
 After clone this repo go inside the directory and run :
@@ -12,7 +18,7 @@ To start the service on default configurations run:
 ```bash
 npm start
 ```
-The Service will listen on localhost:3000.
+The Service will listen on [localhost:3000](http://localhost:3000).
 
 If you want to run it under an other port/address run:
 
