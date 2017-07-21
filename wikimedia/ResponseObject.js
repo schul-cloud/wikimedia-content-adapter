@@ -76,14 +76,14 @@ function getErrorMessage(status){
 function getError(status){
 
 	var error = {
-			  "jsonapi": {
-				"version" : "1.0",
-				"meta": {
-				  "name" : "Test Server Response",
-				  "source" : "https://github.com/schul-cloud/resources-api-v1/issues/42",
-				  "description": "This is a test server yielding an error."
-				}
-			  },
+        "jsonapi":{
+                "version": "1.0",
+                "meta" :{
+                        "name": "wikimedia-content-adapter",
+                        "source": "https://github.com/schul-cloud/wikimedia-content-adapter",
+                        "description": "This is an adpter for media-file search on wikimedia."
+                    }
+            },
 			  "errors": []
 			};
 	error.errors.push(getErrorMessage(status));
