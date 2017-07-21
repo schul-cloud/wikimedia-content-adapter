@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js ",
     "pretest": "node app.js&",
-    "test":  "python3 -m schul_cloud_search_tests.search --url=http://localhost:3000/v1 || :",
+    "test":  "python3 -m schul_cloud_search_tests.search --url=http://localhost:3000/v1",
     "posttest": "npm stop",
     "stop":  "pkill wikimedia"
   },
