@@ -38,16 +38,17 @@ When running without params port or address will be default
 
 Query params:
 
--	q = query value for searching.
+-	Q = query value for searching.
 -	page[limit] = max number of result elements.
 -	page[offset] = offset of the result elements.
 -	filer[filterKey] = filter for the result. The filterKey must be an key of the result object.
 
 ## License
-
+```
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
+```
