@@ -5,7 +5,7 @@ node_js:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq nodejs npm python3 python3-pip
-  - sudo pip install --user schul-cloud-search-tests
+  - sudo pip3 install schul-cloud-search-tests
 
 install:
   - npm install
