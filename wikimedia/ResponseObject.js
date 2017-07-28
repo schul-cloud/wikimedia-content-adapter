@@ -64,7 +64,11 @@ function getErrorMessage(status){
             msg.title = "Internal Server Error";
             msg.detail =  "Something went wrong.";
             break;
-		case 404 :
+        case 406 :
+            msg.title = "Not Acceptable";
+            msg.detail =  "Content type is not Acceptable";
+            break;
+        case 404 :
 		default :
 			msg.title = "Not Found";
 			msg.detail =  "The requested resource could not be found.";

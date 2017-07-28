@@ -63,8 +63,13 @@ function Request(query,version,serveradresse,send,err){
 	}
 
 // execute the request and send the response.
-	this.execute = function() {
+	this.execute = function(accept) {
 		// create an request-promise
+        if(!accept){
+            status = 406;
+            errCallback(require("./ResponseObject.js").getErrorResponse(version,status),status);
+            return;
+        }
 		var rpFiles = require('request-promise');
 		rpFiles(createURL.fileList(filenames)).then(function(requestResult){
 				return JSON.parse(requestResult);
