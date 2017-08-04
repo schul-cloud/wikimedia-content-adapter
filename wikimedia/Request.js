@@ -3,6 +3,7 @@ const apiURL = 'https://commons.wikimedia.org/w/api.php'; // the url form the Wi
 // create a new Request object which has all necessary function an objects vor make an request on wikimedia
 function Request(query,version,serveradresse,send,err){
 
+    var isUndefined = function(object){ return typeof object == 'undefined';  }
 	// pageParams Container
 	var pageParams = {
 		limit : 10, // default limit
@@ -55,9 +56,9 @@ function Request(query,version,serveradresse,send,err){
 					}
 				);
 			}
-			if(typeof (query.page) !== undefined){
-					result.links.self.meta.limit=pageParams.limit = query.page.limit!== undefined ?  Number(query.page.limit) : pageParams.limit;
-					result.links.self.meta.offset = pageParams.offset = query.page.offset !== undefined ? Number(query.page.offset) : pageParams.offset;
+			if(!isUndefined(query.page)){
+                result.links.self.meta.limit=pageParams.limit = isUndefined(query.page.limit) ? Number(pageParams.limit): Number(query.page.limit);
+                result.links.self.meta.offset = pageParams.offset = isUndefined(query.page.offset) ? Number(pageParams.offset): Number(query.page.offset);
 			}
 
             if ( isNaN(pageParams.limit) || pageParams.limit <= 0) status = 400;
