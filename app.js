@@ -35,7 +35,9 @@ app.get("/v1",function(req,res){
             res.send(error);
         });	// create a new wikimedia-Request
     var accept = !(typeof req.header("accept") == 'undefined');
-    accept = accept &&req.accepts('application/vnd.api+json');
+    accept = accept && !(req.header("accept") == " ");
+    accept = accept && !(req.header("accept") == "");
+    accept = accept && req.accepts('application/vnd.api+json');
 	wikimedia.execute(accept);
 });
 
