@@ -23,4 +23,4 @@ module.exports = {
 	getURLCreator : function(version,apiURL){
 		return URLCreator(version,apiURL);
 	}
-}
+};

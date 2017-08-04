@@ -86,10 +86,10 @@ function getError(status){
                         "name": "wikimedia-content-adapter",
                         "source": "https://github.com/schul-cloud/wikimedia-content-adapter",
                         "description": "This is an adpter for media-file search on wikimedia."
-                    }
-            },
-			  "errors": []
-			};
+                }
+        },
+        "errors": []
+    };
 	error.errors.push(getErrorMessage(status));
 	return error;
 
@@ -107,5 +107,5 @@ module.exports = {
 	getErrorResponse : function(version,status){
 		return getError(status);
 	}
-}
+};
 	

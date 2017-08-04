@@ -37,11 +37,11 @@ function Request(query,version,serveradresse,send,err){
 	switch (version){
 		case 1 :
 			linkcreator.address = serveradresse;
-			if (query.Q == undefined ) status = 400;
+			if (query.Q === undefined ) status = 400;
 			searchKeyword = encodeURIComponent(query.Q);
 			filenames.URLparams.push("srsearch="+searchKeyword);
 			for(var element in query){
-				if(!(element =="Q" || element == "page" || element == "filter")) {
+				if(!(element ==="Q" || element === "page" || element === "filter")) {
 					status = 400;
 				}
 			}
@@ -55,11 +55,13 @@ function Request(query,version,serveradresse,send,err){
 					}
 				);
 			}
-			if(query.page){
-					result.links.self.meta.limit=pageParams.limit = query.page.limit || pageParams.limit;
-					result.links.self.meta.offset = pageParams.offset = query.page.offset || pageParams.offset;
+			if(typeof (query.page) !== undefined){
+					result.links.self.meta.limit=pageParams.limit = query.page.limit!== undefined ?  Number(query.page.limit) : pageParams.limit;
+					result.links.self.meta.offset = pageParams.offset = query.page.offset !== undefined ? Number(query.page.offset) : pageParams.offset;
 			}
-			if (pageParams.limit <= 0 || pageParams.offset < 0) status = 404;
+
+            if ( isNaN(pageParams.limit) || pageParams.limit <= 0) status = 400;
+            if ( isNaN(pageParams.offset) || pageParams.offset < 0) status = 400;
 	}
 
 // execute the request and send the response.
@@ -67,6 +69,8 @@ function Request(query,version,serveradresse,send,err){
 		// create an request-promise
         if(!accept){
             status = 406;
+        }
+        if (status !== 200 ){
             errCallback(require("./ResponseObject.js").getErrorResponse(version,status),status);
             return;
         }
@@ -102,8 +106,8 @@ function Request(query,version,serveradresse,send,err){
 							searchKeyword,
 							filter,
 							result.links);
-				if (cValidObjs == 0) status = 404;
-				if (status  == 200) sendCallback(JSON.stringify(result));
+				if (cValidObjs === 0) status = 404;
+				if (status  === 200) sendCallback(JSON.stringify(result));
 				else            	errCallback(require("./ResponseObject.js").getErrorResponse(version , status),status);
 			}).catch(function(err){
 			    status = 500;
@@ -116,7 +120,7 @@ function Request(query,version,serveradresse,send,err){
             console.log(err);
 		});
 			return rpFiles;
-	}
+	};
 	return this;
 }
 
