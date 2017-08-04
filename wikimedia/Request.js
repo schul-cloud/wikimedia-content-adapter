@@ -59,6 +59,8 @@ function Request(query,version,serveradresse,send,err){
 			if(!isUndefined(query.page)){
                 result.links.self.meta.limit=pageParams.limit = isUndefined(query.page.limit) ? Number(pageParams.limit): Number(query.page.limit);
                 result.links.self.meta.offset = pageParams.offset = isUndefined(query.page.offset) ? Number(pageParams.offset): Number(query.page.offset);
+			    if(!isUndefined(query.page.limit) && query.page.limit == '') status = 400;
+                if(!isUndefined(query.page.offset) && query.page.offset == '') status = 400;
 			}
 
             if ( isNaN(pageParams.limit) || pageParams.limit <= 0) status = 400;
