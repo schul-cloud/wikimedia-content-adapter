@@ -1,4 +1,4 @@
-![Travis Status](https://travis-ci.org/schul-cloud/wikimedia-content-adapter.svg?branch=master)
+[![Travis Status](https://travis-ci.org/schul-cloud/wikimedia-content-adapter.svg?branch=master)](https://travis-ci.org/schul-cloud/wikimedia-content-adapter)
 
 # wikimedia-content-adapter
 
