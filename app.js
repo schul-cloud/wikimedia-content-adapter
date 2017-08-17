@@ -2,7 +2,7 @@ var express = require('express');		// the restframework
 var app = express();							// create the webapplication
 
 // default value for Address and Port
-var address = "localhost";
+var address = "127.0.0.1";
 var port = 3000;
 
 // if necessary parse new port and/or address.
@@ -43,11 +43,6 @@ app.get("/v1",function(req,res){
 
 process.title = "wikimedia";
 console.log(process.title);
-var server = app.listen(port,address, function () {
-
-  var host = server.address().address;
-  var port = server.address().port;
-
-  console.log("Example app listening at http://%s:%s", host, port)
-
+var server = app.listen(port, function () {
+  console.log("Example app listening at http://%s:%s", address, port)
 });
