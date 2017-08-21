@@ -60,7 +60,7 @@ function getLicense(license , copyrighted){
 		licenseObj.value = license.value;
 
 	if( copyrighted !== undefined)
-		licenseObj.copyrighted =  Boolean( copyrighted.value);
+		licenseObj.copyrighted = copyrighted.value === "True";
 	return licenseObj;
 }
 
