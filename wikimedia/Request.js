@@ -1,139 +1,108 @@
 const apiURL = 'https://commons.wikimedia.org/w/api.php'; // the url form the Wikimedia Rest api.
 
-// create a new Request object which has all necessary function an objects vor make an request on wikimedia
-function Request(query,version,serveradresse,send,err){
+const RequestParams = {
+    URLparams : ["action=query","format=json","prop=imageinfo","iiextmetadatalanguage=de"],
+    props : ["timestamp","user","url","size","mime","mediatype","dimensions","metadata","commonmetadata","extmetadata"]};
+const FileRequestParams = {
+    URLparams : ["action=query", "list=search","format=json","srnamespace=6","srqiprofile=classic","srwhat=text","srprop=","srlimit=25"]
+};
 
-    var isUndefined = function(object){ return typeof object == 'undefined';  }
-	// pageParams Container
-	var pageParams = {
-		limit : 10, // default limit
-		offset : 0	// default offset
-	};
+function isUndefined(object){ return typeof object == 'undefined';  }
 
-	var searchKeyword = "";
-	var status = 200;
-	var sendCallback = send;	// send function as callback            (response)
-    var errCallback = err;	    // send function as callback for Errors (response,status)
+function getFileRequestUrl(q) {
+    return apiURL+ "?"+ FileRequestParams.URLparams.join("&") + "&srsearch="+q;
+}
+function getInfoRequestURL(filenames) {
+    var props = "iiprop=" + RequestParams.props.join("%7C");
+    filenames = "titles=" + filenames.join("%7C");
+    return  requestURL = apiURL +"?"+ RequestParams.URLparams.join("&") + "&"+ props + "&" + filenames  ;
+}
 
-
-	// container for  filenames which get from wikimedia (unfiltert)
-	var filenames = require("./FileNameContainer.js").getFileNameContainer(version);
-
-	// container for all fileinfos form the Filenames in "filenames" which get from wikimedia
-	var fileinfos = require("./FileInfoContainer.js").getFileInfoContainer(version);
-
-	//handle filtering
-	var filter = require("./ResultFilter.js").getFilter(version);
-
-	// handle host functions
-	var linkcreator = require("./LinksCreator.js").getLinkCreator(version);
-
-	// The result object which send as response.
-	var result = require("./ResponseObject.js").getResultObject(version);
-
-	// handle request-urls for Wikimedia.
-	var createURL = require("./RequestURLCreator.js").getURLCreator(version,apiURL);
-
-	// init form Consturctor
-	switch (version){
-		case 1 :
-			linkcreator.address = serveradresse;
-			if (query.Q === undefined ) status = 400;
-			searchKeyword = encodeURIComponent(query.Q);
-			filenames.URLparams.push("srsearch="+searchKeyword);
-			for(var element in query){
-				if(!(element ==="Q" || element === "page" || element === "filter")) {
-					status = 400;
-				}
-			}
-			var filterQuery = query.filter;
-			for( filterParam in filterQuery	){
-				filter.count++ ;
-				filter.data.push(
-					{
-						name:filterParam,
-						value:filterQuery[filterParam]
-					}
-				);
-			}
-			if(!isUndefined(query.page)){
-                result.links.self.meta.limit=pageParams.limit = isUndefined(query.page.limit) ? Number(pageParams.limit): Number(query.page.limit);
-                result.links.self.meta.offset = pageParams.offset = isUndefined(query.page.offset) ? Number(pageParams.offset): Number(query.page.offset);
-			    if(!isUndefined(query.page.limit) && query.page.limit == '') status = 400;
-                if(!isUndefined(query.page.offset) && query.page.offset == '') status = 400;
-			}
-
-            if ( isNaN(pageParams.limit) || pageParams.limit <= 0) status = 400;
-            if ( isNaN(pageParams.offset) || pageParams.offset < 0) status = 400;
-	}
-
-// execute the request and send the response.
-	this.execute = function(accept) {
-	    var errorHandler = require("./ErrorHandler.js");
-		// create an request-promise
-        if(!accept){
-            status = 406;
+function getParams(query , params){
+    for(var element in query){
+        if(!(element ==="Q" || element === "page" || element === "filter")) {
+            return 400;
         }
-        if (status !== 200 ){
-            errCallback(errorHandler.getMessage(status),status);
-            return;
+    }
+    if (isUndefined(query.Q)) return 400;
+    params.q = encodeURIComponent(query.Q);
+    if (!isUndefined(query.page)) {
+        params.page.limit  = isUndefined(query.page.limit)  ? Number(params.page.limit)  : Number(query.page.limit);
+        params.page.offset = isUndefined(query.page.offset) ? Number(params.page.offset) : Number(query.page.offset);
+        if (!isUndefined(query.page.limit)  && query.page.limit == '')  return 400;
+        if (!isUndefined(query.page.offset) && query.page.offset == '') return 400;
+    }
+    if ( isNaN(params.page.limit)  || params.page.limit <= 0) return 400;
+    if ( isNaN(params.page.offset) || params.page.offset < 0) return 400;
+
+    if (!isUndefined(query.filter)){
+        for( filter in query.filter	){
+            params.filter.count++ ;
+            params.filter.data.push(
+                {
+                    name:filter,
+                    value:query.filter[filter]
+                }
+            );
         }
-		var rpFiles = require('request-promise');
-		rpFiles(createURL.fileList(filenames)).then(function(requestResult){
-				return JSON.parse(requestResult);
-		}).then(function(resultObject){
-			var files = resultObject.query.search;
-			for(var index in files){
-				filenames.data.push(encodeURIComponent(files[index].title));
-			}
-			rpFileInfo = require('request-promise')(createURL.fileInfos(filenames,fileinfos)).then(function(requesResult){
-				return JSON.parse(requesResult);
-			}).then(function(InfosforFiles){
-				var InfosforFiles = InfosforFiles.query.pages;
-				var cValidObjs = 0;
-				for(var index in InfosforFiles){
-					var InfoforFile = InfosforFiles[index];
-					var outputObj = fileinfos.convert(InfoforFile);
-					if ( filter.validate(outputObj) ){
-						cValidObjs += 1;
-					if (pageParams.offset <= 0 && result.links.self.meta.limit > result.data.length){
-						result.links.self.meta.count++;
-						result.data.push(outputObj);
-					}else
-						pageParams.offset--;
-					}
-				}
-				linkcreator.fillLinks(
-							result.links.self.meta.limit,
-							result.links.self.meta.offset,
-							cValidObjs,
-							searchKeyword,
-							filter,
-							result.links);
-				if (cValidObjs === 0) status = 404;
-				if (status  === 200) sendCallback(JSON.stringify(result));
-				else                 errCallback(errorHandler.getMessage(status),status);
-			}).catch(function(err){
-			    status = 500;
-                errCallback(errorHandler.getMessage(status),status);
-                console.error(err);
-			});
-		}).catch(function(err){
+    }
+    return 200;
+}
+
+module.exports.makeRequest = function(query,serveraddress, accept , errCallback ,sendCallback) {
+    var errorHandler = require("./ErrorHandler.js");
+    var fileList = [];
+    var status = 200;
+    if (!accept) {
+        errCallback(errorHandler.getMessage(406),406);
+        return 0;
+    }
+    var params = {
+        q : "",
+        page : {
+            offset : 0 ,
+            limit : 10
+        },
+        filter : {
+            count : 0,
+            data : []
+        },
+        serveraddress : serveraddress
+    };
+    status = getParams(query,params);
+    var rpFiles = require('request-promise');
+    rpFiles(getFileRequestUrl(params.q)).then(function(requestResult){
+        return JSON.parse(requestResult);
+    }).then(function(resultObject){
+        var files = resultObject.query.search;
+        for(var index in files){
+            fileList.push(encodeURIComponent(files[index].title));
+        }
+        console.log(fileList);
+        rpFileInfo = require('request-promise')(getInfoRequestURL(fileList)).then(function(requesResult){
+            return JSON.parse(requesResult);
+        }).then(function(InfosforFiles){
+            var InfosforFiles = InfosforFiles.query.pages;
+            var responseHandler = require("./ResponseHandler.js").getHandler(params);
+            for (element in InfosforFiles)
+                responseHandler.addData(InfosforFiles[element]);
+
+            if (responseHandler.data.length == 0) {
+                errCallback(errorHandler.getMessage(404), 404);
+                return 0;
+            }
+            sendCallback(responseHandler.getResponse());
+        }).catch(function(err){
             status = 500;
             errCallback(errorHandler.getMessage(status),status);
             console.error(err);
-		});
-			return rpFiles;
-	};
-	return this;
-}
-
-module.exports = {
-	getRequest :
-		function(query,version,serveradresse,send,err){
-			return Request(query,version,serveradresse,send,err);
-		}
-	};
+        });
+    }).catch(function(err){
+        status = 500;
+        errCallback(errorHandler.getMessage(status),status);
+        console.error(err);
+    });
+};
 
 
 
