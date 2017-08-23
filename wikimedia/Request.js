@@ -70,6 +70,10 @@ module.exports.makeRequest = function(query,serveraddress, accept , errCallback 
         serveraddress : serveraddress
     };
     status = getParams(query,params);
+    if (status != 200) {
+        errCallback(errorHandler.getMessage(406),406);
+        return 0;
+    }
     var rpFiles = require('request-promise');
     rpFiles(getFileRequestUrl(params.q)).then(function(requestResult){
         return JSON.parse(requestResult);
@@ -78,7 +82,6 @@ module.exports.makeRequest = function(query,serveraddress, accept , errCallback 
         for(var index in files){
             fileList.push(encodeURIComponent(files[index].title));
         }
-        console.log(fileList);
         rpFileInfo = require('request-promise')(getInfoRequestURL(fileList)).then(function(requesResult){
             return JSON.parse(requesResult);
         }).then(function(InfosforFiles){
