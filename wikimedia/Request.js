@@ -41,6 +41,7 @@ function getParams(query , params){
             params.filter.data.push(
                 {
                     name:filter,
+
                     value:query.filter[filter]
                 }
             );
