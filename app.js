@@ -23,21 +23,20 @@ if(process.argv.length > 2){
 // routing for api-v1 : version 1
 app.get("/v1",function(req,res){
 	res = res.set('content-type', 'application/vnd.api+json');
-   	var fullUrl = req.protocol + '://' + address +":" + port + req.path;
-	var wikimedia = require("./wikimedia/Request.js").getRequest(req.query,1,fullUrl,
-        function(response){
-            if(typeof response === Object) response = JSON.stringify(response);
-            res.send(response);
-        },function (error , status) {
-            res.status(status);
-            if(typeof error === Object) error = JSON.stringify(error);
-            res.send(error);
-        });	// create a new wikimedia-Request
     var accept = !(typeof req.header("accept") == 'undefined');
     accept = accept && !(req.header("accept") == " ");
     accept = accept && !(req.header("accept") == "");
     accept = accept && req.accepts('application/vnd.api+json');
-	wikimedia.execute(accept);
+   	var fullUrl = req.protocol + '://' + address +":" + port + req.path;
+	require("./wikimedia/Request.js").makeRequest(req.query,fullUrl,accept,
+        function (error , status) {
+            res.status(status);
+            if(typeof error === Object) error = JSON.stringify(error);
+            res.send(error);
+        },function(response){
+            if(typeof response === Object) response = JSON.stringify(response);
+            res.send(response);
+        });	// create a new wikimedia-Request
 });
 
 process.title = "wikimedia";
