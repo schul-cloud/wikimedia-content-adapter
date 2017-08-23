@@ -69,12 +69,13 @@ function Request(query,version,serveradresse,send,err){
 
 // execute the request and send the response.
 	this.execute = function(accept) {
+	    var errorHandler = require("./ErrorHandler.js");
 		// create an request-promise
         if(!accept){
             status = 406;
         }
         if (status !== 200 ){
-            errCallback(require("./ResponseObject.js").getErrorResponse(version,status),status);
+            errCallback(errorHandler.getMessage(status),status);
             return;
         }
 		var rpFiles = require('request-promise');
@@ -111,16 +112,16 @@ function Request(query,version,serveradresse,send,err){
 							result.links);
 				if (cValidObjs === 0) status = 404;
 				if (status  === 200) sendCallback(JSON.stringify(result));
-				else            	errCallback(require("./ResponseObject.js").getErrorResponse(version , status),status);
+				else                 errCallback(errorHandler.getMessage(status),status);
 			}).catch(function(err){
 			    status = 500;
-                errCallback(require("./ResponseObject.js").getErrorResponse(version , status),status);
-                console.log(err);
+                errCallback(errorHandler.getMessage(status),status);
+                console.error(err);
 			});
 		}).catch(function(err){
             status = 500;
-            errCallback(require("./ResponseObject.js").getErrorResponse(version , status),status);
-            console.log(err);
+            errCallback(errorHandler.getMessage(status),status);
+            console.error(err);
 		});
 			return rpFiles;
 	};
