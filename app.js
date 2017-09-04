@@ -26,7 +26,8 @@ app.get("/v1",function(req,res){
     var accept = !(typeof req.header("accept") == 'undefined');
     accept = accept && !(req.header("accept") == " ");
     accept = accept && !(req.header("accept") == "");
-    accept = accept && req.accepts('application/vnd.api+json');
+    accept = accept && req.accepts('application/vnd.api+json') === 'application/vnd.api+json';
+    console.log( accept );
    	var fullUrl = req.protocol + '://' + address +":" + port + req.path;
 	require("./wikimedia/Request.js").makeRequest(req.query,fullUrl,accept,
         function (error , status) {

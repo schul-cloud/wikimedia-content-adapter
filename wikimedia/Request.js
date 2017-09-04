@@ -72,7 +72,7 @@ module.exports.makeRequest = function(query,serveraddress, accept , errCallback 
     };
     status = getParams(query,params);
     if (status != 200) {
-        errCallback(errorHandler.getMessage(406),406);
+        errCallback(errorHandler.getMessage(status),status);
         return 0;
     }
     var rpFiles = require('request-promise');

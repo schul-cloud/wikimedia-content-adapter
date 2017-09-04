@@ -154,7 +154,7 @@ module.exports.getHandler= function(params){
     };
     Handler.addData = function(element) {
         var result = RequestDataObject(1);
-        result.id = ++this.resourceId;
+        result.id = (++this.resourceId).toString();
         result.attributes.title = element.title.replace("File:","");
         result.attributes.url = element.imageinfo[0].url;
         result.attributes.contextUrl = element.imageinfo[0].descriptionurl;
