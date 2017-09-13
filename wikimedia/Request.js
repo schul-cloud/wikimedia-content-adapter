@@ -41,7 +41,6 @@ function getParams(query , params){
             params.filter.data.push(
                 {
                     name:filter,
-
                     value:query.filter[filter]
                 }
             );
@@ -55,7 +54,8 @@ module.exports.makeRequest = function(query,serveraddress, accept , errCallback 
     var fileList = [];
     var status = 200;
     if (!accept) {
-        errCallback(errorHandler.getMessage(406),406);
+        status = 406;
+        errCallback(errorHandler.getMessage(status),status);
         return 0;
     }
     var params = {
@@ -92,7 +92,8 @@ module.exports.makeRequest = function(query,serveraddress, accept , errCallback 
                 responseHandler.addData(InfosforFiles[element]);
 
             if (responseHandler.data.length == 0) {
-                errCallback(errorHandler.getMessage(404), 404);
+                status = 404;
+                errCallback(errorHandler.getMessage(status), status);
                 return 0;
             }
             sendCallback(responseHandler.getResponse());
