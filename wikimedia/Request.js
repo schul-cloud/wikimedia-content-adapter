@@ -83,10 +83,10 @@ module.exports.makeRequest = function(query,serveraddress, accept , errCallback 
         for(var index in files){
             fileList.push(encodeURIComponent(files[index].title));
         }
-        rpFileInfo = require('request-promise')(getInfoRequestURL(fileList)).then(function(requesResult){
-            return JSON.parse(requesResult);
+        rpFileInfo = require('request-promise')(getInfoRequestURL(fileList)).then(function(requestResult){
+            return JSON.parse(requestResult);
         }).then(function(InfosforFiles){
-            var InfosforFiles = InfosforFiles.query.pages;
+            var InfosforFiles = isUndefined(InfosforFiles.query) ? [] : InfosforFiles.query.pages;
             var responseHandler = require("./ResponseHandler.js").getHandler(params);
             for (element in InfosforFiles)
                 responseHandler.addData(InfosforFiles[element]);
