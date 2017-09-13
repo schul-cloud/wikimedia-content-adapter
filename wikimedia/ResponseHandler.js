@@ -90,8 +90,9 @@ module.exports.getHandler= function(params){
     Handler.isValid = function(result){
         result = result.attributes;
         var valid = true ;
-        for( var i = 0 ; i < this.count; i++){
-            var filterObj = this.data[i];
+        var filter = params.filter;
+        for( var i = 0 ; i < filter.count; i++){
+            var filterObj = filter.data[i];
             switch (filterObj.name){
                 case "license":
                     var isInLicenses = false;
