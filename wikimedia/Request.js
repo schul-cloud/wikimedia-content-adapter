@@ -90,12 +90,6 @@ module.exports.makeRequest = function(query,serveraddress, accept , errCallback 
             var responseHandler = require("./ResponseHandler.js").getHandler(params);
             for (element in InfosforFiles)
                 responseHandler.addData(InfosforFiles[element]);
-
-            if (responseHandler.data.length == 0) {
-                status = 404;
-                errCallback(errorHandler.getMessage(status), status);
-                return 0;
-            }
             sendCallback(responseHandler.getResponse());
         }).catch(function(err){
             status = 500;
