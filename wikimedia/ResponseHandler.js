@@ -146,8 +146,16 @@ module.exports.getHandler= function(params){
         result.links.first 		= getLinkUrl(params.page.limit,0);
         result.links.self.href 	= getLinkUrl(params.page.limit,params.page.offset);
         result.links.prev 			= (prevOffset >= 0 ) ? getLinkUrl(params.page.limit,prevOffset) : null;
-        result.links.next 			= (nextOffset > params.page.offset) ? getLinkUrl(params.page.limit,nextOffset) : null;
-        result.links.last 			= (nextOffset > params.page.offset) ? getLinkUrl(params.page.limit,lastOffset) : null;
+        result.links.next 			= (nextOffset > params.page.offset ) ? getLinkUrl(params.page.limit,nextOffset) : null;
+        result.links.last 			= (nextOffset > params.page.offset ) ? getLinkUrl(params.page.limit,lastOffset) : result.links.self.href;
+
+        if ( Handler.data.length == 0) {
+            result.links.first = null;
+            result.links.prev  = null;
+            result.links.next  = null;
+            result.links.last  = null;
+        }
+
 
 
 
