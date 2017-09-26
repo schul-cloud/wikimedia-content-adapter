@@ -5,6 +5,8 @@ const contentType = 'application/vnd.api+json';
 var address = "127.0.0.1";
 var port = 3000;
 
+app.set("json spaces","  ");
+
 // if necessary parse new port and/or address.
 if(process.argv.length > 2){
 	for(var i = 2 ; i < process.argv.length ; i++){
@@ -31,11 +33,9 @@ app.get("/v1",function(req,res){
 	require("./wikimedia/Request.js").makeRequest(req.query,fullUrl,accept,
         function (error , status) {
             res.status(status);
-            if(typeof error === Object) error = JSON.stringify(error);
-            res.send(error);
+            res.json(error);
         },function(response){
-            if(typeof response === Object) response = JSON.stringify(response);
-            res.send(response);
+            res.json(response);
         });	// create a new wikimedia-Request
 });
 
