@@ -1,5 +1,7 @@
 [![Travis Status](https://travis-ci.org/schul-cloud/wikimedia-content-adapter.svg?branch=master)](https://travis-ci.org/schul-cloud/wikimedia-content-adapter) [![Docker Build Statu](https://img.shields.io/docker/build/schulcloud/wikimedia-content-adapter.svg)](https://hub.docker.com/r/schulcloud/wikimedia-content-adapter/builds/)
 
+[![Dockerhub status](https://dockerbuildbadges.quelltext.eu/status.svg?organization=schulcloud&repository=wikimedia-content-adapter)](https://hub.docker.com/r/schulcloud/wikimedia-content-adapter/builds/)
+
 # wikimedia-content-adapter
 
 This repository contains a service adapter for querying the [Wikimedia API][wikimedia-api].
