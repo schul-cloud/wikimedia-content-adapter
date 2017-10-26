@@ -13,6 +13,6 @@ COPY . /app
 USER app 
 WORKDIR /app
 
-# bind on port 3000
-EXPOSE 3000
+# bind on port 8080
+EXPOSE 8080
 CMD ["node", "app.js"]

@@ -2,8 +2,8 @@ var express = require('express');		// the restframework
 var app = express();							// create the webapplication
 const contentType = 'application/vnd.api+json';
 // default value for Address and Port
-var address = "127.0.0.1";
-var port = 3000;
+var address = "0.0.0.0";
+var port = 8080;
 
 app.set("json spaces","  ");
 
@@ -41,6 +41,5 @@ app.get("/v1",function(req,res){
 
 process.title = "wikimedia";
 console.log(process.title);
-var server = app.listen(port, function () {
-  console.log("Example app listening at http://%s:%s", address, port)
-});
+var server = app.listen(port, address);
+console.log("Example app listening at http://%s:%s", address, port)
