@@ -1,4 +1,4 @@
-[![Travis Status](https://travis-ci.org/schul-cloud/wikimedia-content-adapter.svg?branch=master)](https://travis-ci.org/schul-cloud/wikimedia-content-adapter) [![Docker Build Statu](https://img.shields.io/docker/build/schulcloud/wikimedia-content-adapter.svg)](https://hub.docker.com/r/schulcloud/wikimedia-content-adapter/builds/)
+[![Travis Status](https://travis-ci.org/schul-cloud/wikimedia-content-adapter.svg?branch=master)](https://travis-ci.org/schul-cloud/wikimedia-content-adapter) [![Docker Build Statu](https://img.shields.io/docker/build/schulcloud/wikimedia-content-adapter.svg)](https://hub.docker.com/r/schulcloud/wikimedia-content-adapter/builds/) [![Greenkeeper badge](https://badges.greenkeeper.io/schul-cloud/wikimedia-content-adapter.svg)](https://greenkeeper.io/)
 
 # wikimedia-content-adapter
 
